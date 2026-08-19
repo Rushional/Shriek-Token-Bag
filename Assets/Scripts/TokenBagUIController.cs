@@ -42,37 +42,87 @@ public class TokenBagUIController : MonoBehaviour
     private bool confirmationOpen;
     private bool returnSelectionOpen;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void Bootstrap()
-    {
-        if (FindAnyObjectByType<TokenBagUIController>() != null)
-        {
-            return;
-        }
-
-        var appObject = new GameObject("TokenBagUIController");
-        appObject.AddComponent<TokenBagUIController>();
-    }
-
+    // At runtime, bind to UI GameObjects created in the Editor.
+    // The Editor bootstrap will create the UI once; TokenBagUIController uses those objects at runtime.
     private void Awake()
     {
-        BuildUi();
+        BindReferences();
         gameState.Reset();
         RefreshGameUi();
     }
 
-    private void BuildUi()
+    private void BindReferences()
     {
-        CreateCanvas();
-        CreateRootPanel();
-        CreateMenuButton();
-        CreateGameplayButtons();
-        CreateTextLabels();
-        CreateMenuPanel();
-        CreateConfirmationPanel();
-        CreateRemovedSelectionPanel();
-        CloseAllPanels();
+        // Find primary roots
+        canvas = UnityEngine.Object.FindObjectOfType<Canvas>();
+        if (canvas == null)
+        {
+            Debug.LogError("Canvas not found in scene. Ensure the Editor has created the UI before running.");
+            return;
+        }
+
+        var rootObj = GameObject.Find("TokenBagRoot");
+        if (rootObj == null)
+        {
+            Debug.LogError("TokenBagRoot not found in scene. Ensure the Editor has created the UI before running.");
+            return;
+        }
+
+        rootPanel = rootObj.GetComponent<RectTransform>();
+        gameplayRoot = GameObject.Find("GameplayRoot");
+        menuRoot = GameObject.Find("MenuPanel");
+        confirmationRoot = GameObject.Find("ConfirmationPanel");
+        removedSelectionRoot = GameObject.Find("RemovedSelectionPanel");
+        var selectionInfoObj = GameObject.Find("SelectionInfo");
+        selectionInfoRoot = selectionInfoObj;
+
+        // Find buttons and wire up listeners
+        menuButton = GameObject.Find("MenuButton")?.GetComponent<Button>();
+        if (menuButton != null) menuButton.onClick.AddListener(OnMenuButtonClicked);
+
+        drawTokenButton = GameObject.Find("DrawTokenButton")?.GetComponent<Button>();
+        if (drawTokenButton != null) drawTokenButton.onClick.AddListener(OnDrawTokenClicked);
+
+        putBackButton = GameObject.Find("PutBackButton")?.GetComponent<Button>();
+        if (putBackButton != null) putBackButton.onClick.AddListener(OnPutBackClicked);
+
+        removeButton = GameObject.Find("RemoveButton")?.GetComponent<Button>();
+        if (removeButton != null) removeButton.onClick.AddListener(OnRemoveClicked);
+
+        // Menu panel buttons
+        resetBagButton = GameObject.Find("ResetBagButton")?.GetComponent<Button>();
+        if (resetBagButton != null) resetBagButton.onClick.AddListener(OnResetBagClicked);
+
+        returnFromRemovedButton = GameObject.Find("ReturnFromRemovedButton")?.GetComponent<Button>();
+        if (returnFromRemovedButton != null) returnFromRemovedButton.onClick.AddListener(OnReturnFromRemovedClicked);
+
+        menuCloseButton = GameObject.Find("MenuCloseButton")?.GetComponent<Button>();
+        if (menuCloseButton != null) menuCloseButton.onClick.AddListener(CloseMenu);
+
+        // Confirmation
+        confirmationYesButton = GameObject.Find("ConfirmYesButton")?.GetComponent<Button>();
+        if (confirmationYesButton != null) confirmationYesButton.onClick.AddListener(OnResetConfirmed);
+
+        confirmationNoButton = GameObject.Find("ConfirmNoButton")?.GetComponent<Button>();
+        if (confirmationNoButton != null) confirmationNoButton.onClick.AddListener(OnConfirmationCancelled);
+
+        // Selection close
+        selectionCloseButton = GameObject.Find("SelectionCloseButton")?.GetComponent<Button>();
+        if (selectionCloseButton != null) selectionCloseButton.onClick.AddListener(CloseRemovedSelection);
+
+        // Texts
+        currentKillerText = GameObject.Find("CurrentKillerText")?.GetComponent<TextMeshProUGUI>();
+        removedKillersText = GameObject.Find("RemovedKillersText")?.GetComponent<TextMeshProUGUI>();
+
+        // Ensure panels are deactivated by default
+        if (menuRoot != null) menuRoot.SetActive(false);
+        if (confirmationRoot != null) confirmationRoot.SetActive(false);
+        if (removedSelectionRoot != null) removedSelectionRoot.SetActive(false);
+
+        // Gameplay root active
+        if (gameplayRoot != null) gameplayRoot.SetActive(true);
     }
+
 
     private void CreateCanvas()
     {
@@ -342,7 +392,9 @@ public class TokenBagUIController : MonoBehaviour
             return;
         }
 
+        // Hide the menu (we will return to it if the player closes the selection without choosing).
         menuRoot.SetActive(false);
+        menuOpen = false;
         BuildReturnSelectionList();
         removedSelectionRoot.SetActive(true);
         returnSelectionOpen = true;
@@ -435,8 +487,18 @@ public class TokenBagUIController : MonoBehaviour
 
     private void CloseRemovedSelection()
     {
-        removedSelectionRoot.SetActive(false);
+        if (removedSelectionRoot != null)
+            removedSelectionRoot.SetActive(false);
+
         returnSelectionOpen = false;
+
+        // Return to menu if it was the source of the selection
+        if (menuRoot != null)
+        {
+            menuRoot.SetActive(true);
+            menuOpen = true;
+        }
+
         SetGameplayControlsActive(true);
     }
 
