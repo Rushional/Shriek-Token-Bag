@@ -1322,24 +1322,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e368f6f1230e334082192a9cee87880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tokenBagRoot: {fileID: 0}
-  gameplayRoot: {fileID: 0}
-  menuRoot: {fileID: 0}
-  confirmationRoot: {fileID: 0}
-  confirmationPrompt: {fileID: 0}
-  removedSelectionRoot: {fileID: 0}
+  gameplayRoot: {fileID: 7507156975605142642}
+  menuPanel: {fileID: 4787796101913555910}
+  confirmationPanel: {fileID: 1354739898696553740}
+  confirmationPrompt: {fileID: 7274856956824232251}
+  removedSelectionPanel: {fileID: 1312805301567496850}
   menuButton: {fileID: 5878950595383318120}
-  drawTokenButton: {fileID: 0}
-  putBackButton: {fileID: 0}
-  removeButton: {fileID: 0}
-  currentKillerText: {fileID: 0}
-  removedKillersText: {fileID: 0}
-  resetBagButton: {fileID: 0}
-  returnFromRemovedButton: {fileID: 0}
-  menuCloseButton: {fileID: 0}
-  confirmationYesButton: {fileID: 0}
-  confirmationNoButton: {fileID: 0}
-  selectionCloseButton: {fileID: 0}
+  drawTokenButton: {fileID: 292510445154379195}
+  putBackButton: {fileID: 7135312516609365343}
+  removeButton: {fileID: 1026720427700856910}
+  currentKillerText: {fileID: 4072429241291769960}
+  removedKillersText: {fileID: 6249009827952924123}
+  resetBagButton: {fileID: 4551868610125105025}
+  returnFromRemovedButton: {fileID: 4582189372529404211}
+  menuCloseButton: {fileID: 1677146462056895660}
+  confirmationYesButton: {fileID: 2209284236217520558}
+  confirmationNoButton: {fileID: 3428694351220907500}
+  selectionCloseButton: {fileID: 859347383530481589}
 --- !u!1 &4444026259051295361
 GameObject:
   m_ObjectHideFlags: 0
