@@ -1328,7 +1328,7 @@ MonoBehaviour:
   confirmationRoot: {fileID: 0}
   confirmationPrompt: {fileID: 0}
   removedSelectionRoot: {fileID: 0}
-  menuButton: {fileID: 0}
+  menuButton: {fileID: 5878950595383318120}
   drawTokenButton: {fileID: 0}
   putBackButton: {fileID: 0}
   removeButton: {fileID: 0}

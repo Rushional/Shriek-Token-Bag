@@ -95,10 +95,6 @@ public class TokenBagUIController : MonoBehaviour
         {
             switch (btn.gameObject.name)
             {
-                case "MenuButton":
-                    menuButton = btn;
-                    menuButton.onClick.AddListener(OnMenuButtonClicked);
-                    break;
                 case "DrawTokenButton":
                     drawTokenButton = btn;
                     drawTokenButton.onClick.AddListener(OnDrawTokenClicked);
@@ -138,9 +134,8 @@ public class TokenBagUIController : MonoBehaviour
             }
         }
 
-        // Also try global finds if any button was not found under root
-        if (menuButton == null) menuButton = GameObject.Find("MenuButton")?.GetComponent<Button>();
-        if (menuButton != null && !menuButton.onClick.GetPersistentEventCount().Equals(0)) { /* already hooked */ } else if (menuButton != null) menuButton.onClick.AddListener(OnMenuButtonClicked);
+        // if (menuButton == null) menuButton = GameObject.Find("MenuButton")?.GetComponent<Button>();
+        if (menuButton != null) menuButton.onClick.AddListener(OnMenuButtonClicked);
 
         if (drawTokenButton == null) drawTokenButton = GameObject.Find("DrawTokenButton")?.GetComponent<Button>();
         if (drawTokenButton != null && drawTokenButton.onClick.GetPersistentEventCount().Equals(0)) drawTokenButton.onClick.AddListener(OnDrawTokenClicked);
