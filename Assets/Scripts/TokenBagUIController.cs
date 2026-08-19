@@ -7,34 +7,36 @@ using UnityEngine.UI;
 
 public class TokenBagUIController : MonoBehaviour
 {
-    private const float ReferenceWidth = 1080f;
-    private const float ReferenceHeight = 2400f;
-
     private readonly KillerBagState gameState = new KillerBagState();
 
     private Canvas canvas;
-    private CanvasScaler canvasScaler;
     private RectTransform rootPanel;
-    private GameObject gameplayRoot;
-    private GameObject menuRoot;
-    private GameObject confirmationRoot;
-    private GameObject removedSelectionRoot;
     private GameObject selectionInfoRoot;
+    [SerializeField] private GameObject tokenBagRoot;
+    [SerializeField] private GameObject gameplayRoot;
+    // currently the prefab doesn't have a menuRoot at all. We probably need it though. 
+    [SerializeField] private GameObject menuRoot;
+    // No confirmation root in prefab, but used in code. This one we maybe can delete?
+    [SerializeField] private GameObject confirmationRoot;
+    [SerializeField] private GameObject confirmationPrompt;
+    // No such thing in prefab. used in code. Wtf copilot...
+    [SerializeField] private GameObject removedSelectionRoot;
 
-    private Button menuButton;
-    private Button drawTokenButton;
-    private Button putBackButton;
-    private Button removeButton;
+    [SerializeField] private Button menuButton;
+    [SerializeField] private Button drawTokenButton;
+    [SerializeField] private Button putBackButton;
+    [SerializeField] private Button removeButton;
 
-    private TextMeshProUGUI currentKillerText;
-    private TextMeshProUGUI removedKillersText;
+    [SerializeField] private TextMeshProUGUI currentKillerText;
+    [SerializeField] private TextMeshProUGUI removedKillersText;
 
-    private Button resetBagButton;
-    private Button returnFromRemovedButton;
-    private Button menuCloseButton;
-    private Button confirmationYesButton;
-    private Button confirmationNoButton;
-    private Button selectionCloseButton;
+    [SerializeField] private Button resetBagButton;
+    [SerializeField] private Button returnFromRemovedButton;
+    [SerializeField] private Button menuCloseButton;
+    [SerializeField] private Button confirmationYesButton;
+    [SerializeField] private Button confirmationNoButton;
+    // Not in prefab, but probably needed.
+    [SerializeField] private Button selectionCloseButton;
 
     private readonly List<Button> returnableButtons = new List<Button>();
 
@@ -298,10 +300,12 @@ public class TokenBagUIController : MonoBehaviour
         SetGameplayControlsActive(false);
 
         var prompt = confirmationRoot.transform.Find("ConfirmationPrompt").GetComponent<TextMeshProUGUI>();
+        // This is wrong. We need to make a new way handle this case. A separate Text or even a panel?
         prompt.text = "There is nothing to return.";
         confirmationYesButton.gameObject.SetActive(false);
         confirmationNoButton.gameObject.SetActive(false);
 
+        // Wtf is this? Move this to the prefab probably?
         var closePromptButton = CreateTextButton(
             confirmationRoot.GetComponent<RectTransform>(),
             "ConfirmationCloseButton",
