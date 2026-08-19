@@ -69,50 +69,116 @@ public class TokenBagUIController : MonoBehaviour
         }
 
         rootPanel = rootObj.GetComponent<RectTransform>();
-        gameplayRoot = GameObject.Find("GameplayRoot");
-        menuRoot = GameObject.Find("MenuPanel");
-        confirmationRoot = GameObject.Find("ConfirmationPanel");
-        removedSelectionRoot = GameObject.Find("RemovedSelectionPanel");
-        var selectionInfoObj = GameObject.Find("SelectionInfo");
+        // Prefer references under TokenBagRoot to avoid collisions with other scene objects
+        Transform rootTransform = rootObj.transform;
+
+        var gameplayTransform = rootTransform.Find("GameplayRoot");
+        gameplayRoot = gameplayTransform != null ? gameplayTransform.gameObject : rootObj.transform.Find("GameplayRoot")?.gameObject;
+
+        var menuTransform = rootTransform.Find("MenuPanel");
+        menuRoot = menuTransform != null ? menuTransform.gameObject : GameObject.Find("MenuPanel");
+
+        var confirmationTransform = rootTransform.Find("ConfirmationPanel");
+        confirmationRoot = confirmationTransform != null ? confirmationTransform.gameObject : GameObject.Find("ConfirmationPanel");
+
+        var removedSelectionTransform = rootTransform.Find("RemovedSelectionPanel");
+        removedSelectionRoot = removedSelectionTransform != null ? removedSelectionTransform.gameObject : GameObject.Find("RemovedSelectionPanel");
+
+        var selectionInfoObj = rootTransform.Find("RemovedSelectionPanel/SelectionInfo")?.gameObject ?? GameObject.Find("SelectionInfo");
         selectionInfoRoot = selectionInfoObj;
 
-        // Find buttons and wire up listeners
-        menuButton = GameObject.Find("MenuButton")?.GetComponent<Button>();
-        if (menuButton != null) menuButton.onClick.AddListener(OnMenuButtonClicked);
+        // Find buttons and wire up listeners by searching under rootObj first
+        var buttons = rootObj.GetComponentsInChildren<Button>(true);
+        foreach (var btn in buttons)
+        {
+            switch (btn.gameObject.name)
+            {
+                case "MenuButton":
+                    menuButton = btn;
+                    menuButton.onClick.AddListener(OnMenuButtonClicked);
+                    break;
+                case "DrawTokenButton":
+                    drawTokenButton = btn;
+                    drawTokenButton.onClick.AddListener(OnDrawTokenClicked);
+                    break;
+                case "PutBackButton":
+                    putBackButton = btn;
+                    putBackButton.onClick.AddListener(OnPutBackClicked);
+                    break;
+                case "RemoveButton":
+                    removeButton = btn;
+                    removeButton.onClick.AddListener(OnRemoveClicked);
+                    break;
+                case "ResetBagButton":
+                    resetBagButton = btn;
+                    resetBagButton.onClick.AddListener(OnResetBagClicked);
+                    break;
+                case "ReturnFromRemovedButton":
+                    returnFromRemovedButton = btn;
+                    returnFromRemovedButton.onClick.AddListener(OnReturnFromRemovedClicked);
+                    break;
+                case "MenuCloseButton":
+                    menuCloseButton = btn;
+                    menuCloseButton.onClick.AddListener(CloseMenu);
+                    break;
+                case "ConfirmYesButton":
+                    confirmationYesButton = btn;
+                    confirmationYesButton.onClick.AddListener(OnResetConfirmed);
+                    break;
+                case "ConfirmNoButton":
+                    confirmationNoButton = btn;
+                    confirmationNoButton.onClick.AddListener(OnConfirmationCancelled);
+                    break;
+                case "SelectionCloseButton":
+                    selectionCloseButton = btn;
+                    selectionCloseButton.onClick.AddListener(CloseRemovedSelection);
+                    break;
+            }
+        }
 
-        drawTokenButton = GameObject.Find("DrawTokenButton")?.GetComponent<Button>();
-        if (drawTokenButton != null) drawTokenButton.onClick.AddListener(OnDrawTokenClicked);
+        // Also try global finds if any button was not found under root
+        if (menuButton == null) menuButton = GameObject.Find("MenuButton")?.GetComponent<Button>();
+        if (menuButton != null && !menuButton.onClick.GetPersistentEventCount().Equals(0)) { /* already hooked */ } else if (menuButton != null) menuButton.onClick.AddListener(OnMenuButtonClicked);
 
-        putBackButton = GameObject.Find("PutBackButton")?.GetComponent<Button>();
-        if (putBackButton != null) putBackButton.onClick.AddListener(OnPutBackClicked);
+        if (drawTokenButton == null) drawTokenButton = GameObject.Find("DrawTokenButton")?.GetComponent<Button>();
+        if (drawTokenButton != null && drawTokenButton.onClick.GetPersistentEventCount().Equals(0)) drawTokenButton.onClick.AddListener(OnDrawTokenClicked);
 
-        removeButton = GameObject.Find("RemoveButton")?.GetComponent<Button>();
-        if (removeButton != null) removeButton.onClick.AddListener(OnRemoveClicked);
+        if (putBackButton == null) putBackButton = GameObject.Find("PutBackButton")?.GetComponent<Button>();
+        if (putBackButton != null && putBackButton.onClick.GetPersistentEventCount().Equals(0)) putBackButton.onClick.AddListener(OnPutBackClicked);
 
-        // Menu panel buttons
-        resetBagButton = GameObject.Find("ResetBagButton")?.GetComponent<Button>();
-        if (resetBagButton != null) resetBagButton.onClick.AddListener(OnResetBagClicked);
+        if (removeButton == null) removeButton = GameObject.Find("RemoveButton")?.GetComponent<Button>();
+        if (removeButton != null && removeButton.onClick.GetPersistentEventCount().Equals(0)) removeButton.onClick.AddListener(OnRemoveClicked);
 
-        returnFromRemovedButton = GameObject.Find("ReturnFromRemovedButton")?.GetComponent<Button>();
-        if (returnFromRemovedButton != null) returnFromRemovedButton.onClick.AddListener(OnReturnFromRemovedClicked);
+        if (resetBagButton == null) resetBagButton = GameObject.Find("ResetBagButton")?.GetComponent<Button>();
+        if (resetBagButton != null && resetBagButton.onClick.GetPersistentEventCount().Equals(0)) resetBagButton.onClick.AddListener(OnResetBagClicked);
 
-        menuCloseButton = GameObject.Find("MenuCloseButton")?.GetComponent<Button>();
-        if (menuCloseButton != null) menuCloseButton.onClick.AddListener(CloseMenu);
+        if (returnFromRemovedButton == null) returnFromRemovedButton = GameObject.Find("ReturnFromRemovedButton")?.GetComponent<Button>();
+        if (returnFromRemovedButton != null && returnFromRemovedButton.onClick.GetPersistentEventCount().Equals(0)) returnFromRemovedButton.onClick.AddListener(OnReturnFromRemovedClicked);
 
-        // Confirmation
-        confirmationYesButton = GameObject.Find("ConfirmYesButton")?.GetComponent<Button>();
-        if (confirmationYesButton != null) confirmationYesButton.onClick.AddListener(OnResetConfirmed);
+        if (menuCloseButton == null) menuCloseButton = GameObject.Find("MenuCloseButton")?.GetComponent<Button>();
+        if (menuCloseButton != null && menuCloseButton.onClick.GetPersistentEventCount().Equals(0)) menuCloseButton.onClick.AddListener(CloseMenu);
 
-        confirmationNoButton = GameObject.Find("ConfirmNoButton")?.GetComponent<Button>();
-        if (confirmationNoButton != null) confirmationNoButton.onClick.AddListener(OnConfirmationCancelled);
+        if (confirmationYesButton == null) confirmationYesButton = GameObject.Find("ConfirmYesButton")?.GetComponent<Button>();
+        if (confirmationYesButton != null && confirmationYesButton.onClick.GetPersistentEventCount().Equals(0)) confirmationYesButton.onClick.AddListener(OnResetConfirmed);
 
-        // Selection close
-        selectionCloseButton = GameObject.Find("SelectionCloseButton")?.GetComponent<Button>();
-        if (selectionCloseButton != null) selectionCloseButton.onClick.AddListener(CloseRemovedSelection);
+        if (confirmationNoButton == null) confirmationNoButton = GameObject.Find("ConfirmNoButton")?.GetComponent<Button>();
+        if (confirmationNoButton != null && confirmationNoButton.onClick.GetPersistentEventCount().Equals(0)) confirmationNoButton.onClick.AddListener(OnConfirmationCancelled);
 
-        // Texts
-        currentKillerText = GameObject.Find("CurrentKillerText")?.GetComponent<TextMeshProUGUI>();
-        removedKillersText = GameObject.Find("RemovedKillersText")?.GetComponent<TextMeshProUGUI>();
+        if (selectionCloseButton == null) selectionCloseButton = GameObject.Find("SelectionCloseButton")?.GetComponent<Button>();
+        if (selectionCloseButton != null && selectionCloseButton.onClick.GetPersistentEventCount().Equals(0)) selectionCloseButton.onClick.AddListener(CloseRemovedSelection);
+
+        // Texts: search under root first
+        currentKillerText = rootObj.GetComponentInChildren<TextMeshProUGUI>(true);
+        // Attempt to find by name
+        var tmpros = rootObj.GetComponentsInChildren<TextMeshProUGUI>(true);
+        foreach (var t in tmpros)
+        {
+            if (t.gameObject.name == "CurrentKillerText") currentKillerText = t;
+            if (t.gameObject.name == "RemovedKillersText") removedKillersText = t;
+        }
+
+        if (currentKillerText == null) currentKillerText = GameObject.Find("CurrentKillerText")?.GetComponent<TextMeshProUGUI>();
+        if (removedKillersText == null) removedKillersText = GameObject.Find("RemovedKillersText")?.GetComponent<TextMeshProUGUI>();
 
         // Ensure panels are deactivated by default
         if (menuRoot != null) menuRoot.SetActive(false);
@@ -336,6 +402,13 @@ public class TokenBagUIController : MonoBehaviour
         }
 
         menuOpen = true;
+        if (menuRoot == null)
+        {
+            Debug.LogError("MenuPanel (menuRoot) not found. Ensure the UI prefabs were created and TokenBagRoot is present in the scene.");
+            menuOpen = false;
+            return;
+        }
+
         menuRoot.SetActive(true);
         SetGameplayControlsActive(false);
     }
