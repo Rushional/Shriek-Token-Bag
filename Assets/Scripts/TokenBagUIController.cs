@@ -9,12 +9,11 @@ public class TokenBagUIController : MonoBehaviour
 {
     private readonly KillerBagState gameState = new KillerBagState();
 
-    // [SerializeField] private GameObject tokenBagRoot;
     [SerializeField] private GameObject gameplayRoot;
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject confirmationPanel;
     [SerializeField] private GameObject confirmationPrompt;
-    [SerializeField] private GameObject removedSelectionPanel;
+    [SerializeField] private GameObject restoreKillerPanel;
 
     [SerializeField] private Button menuButton;
     [SerializeField] private Button drawTokenButton;
@@ -29,9 +28,13 @@ public class TokenBagUIController : MonoBehaviour
     [SerializeField] private Button menuCloseButton;
     [SerializeField] private Button confirmationYesButton;
     [SerializeField] private Button confirmationNoButton;
-    [SerializeField] private Button selectionCloseButton;
-
-    private readonly List<Button> returnableButtons = new List<Button>();
+    [SerializeField] private Button closeKillerOptionsButton;
+    [SerializeField] private GameObject killerOptionsPanel;
+    [SerializeField] private GameObject killerNameButtonPrefab;
+    private List<Button> restoreKillerButtonsList = new List<Button>();
+    [SerializeField] private GameObject noRemovedKillersPanel;
+    [SerializeField] private Button noRemovedKillersButton;
+    [SerializeField] private TextMeshProUGUI noRemovedKillersText;
 
     private bool menuOpen;
     private bool confirmationOpen;
@@ -58,12 +61,12 @@ public class TokenBagUIController : MonoBehaviour
         if (menuCloseButton != null) menuCloseButton.onClick.AddListener(CloseMenu);
         if (confirmationYesButton != null) confirmationYesButton.onClick.AddListener(OnResetConfirmed);
         if (confirmationNoButton != null) confirmationNoButton.onClick.AddListener(OnConfirmationCancelled);
-        if (selectionCloseButton != null) selectionCloseButton.onClick.AddListener(CloseRemovedSelection);
+        if (closeKillerOptionsButton != null) closeKillerOptionsButton.onClick.AddListener(CloseRemovedSelection);
 
         // Ensure panels are deactivated by default
         if (menuPanel != null) menuPanel.SetActive(false);
         if (confirmationPanel != null) confirmationPanel.SetActive(false);
-        if (removedSelectionPanel != null) removedSelectionPanel.SetActive(false);
+        if (restoreKillerPanel != null) restoreKillerPanel.SetActive(false);
 
         // Gameplay root active
         if (gameplayRoot != null) gameplayRoot.SetActive(true);
@@ -75,7 +78,7 @@ public class TokenBagUIController : MonoBehaviour
     {
         menuPanel.SetActive(false);
         confirmationPanel.SetActive(false);
-        removedSelectionPanel.SetActive(false);
+        restoreKillerPanel.SetActive(false);
         menuOpen = false;
         confirmationOpen = false;
         returnSelectionOpen = false;
@@ -162,11 +165,10 @@ public class TokenBagUIController : MonoBehaviour
             return;
         }
 
-        // Hide the menu (we will return to it if the player closes the selection without choosing).
         menuPanel.SetActive(false);
         menuOpen = false;
         BuildReturnSelectionList();
-        removedSelectionPanel.SetActive(true);
+        restoreKillerPanel.SetActive(true);
         returnSelectionOpen = true;
         SetGameplayControlsActive(false);
     }
@@ -185,17 +187,9 @@ public class TokenBagUIController : MonoBehaviour
         confirmationNoButton.gameObject.SetActive(false);
 
         // Wtf is this? Move this to the prefab probably?
-        var closePromptButton = CreateTextButton(
-            confirmationPanel.GetComponent<RectTransform>(),
-            "ConfirmationCloseButton",
-            new Vector2(150f, 50f),
-            new Vector2(0.5f, 0f),
-            new Vector2(0.5f, 0f),
-            new Vector2(0f, 35f),
-            "Close",
-            24,
-            new Color(0.46f, 0.46f, 0.46f, 1f));
+        var closePromptButton = CreateKillerNameButton("Copilot");
 
+        // TODO: probably move this to a separate method. Also replace it with the noRemovedKillersButton. And the others with similarly named elements
         closePromptButton.onClick.AddListener(() =>
         {
             confirmationOpen = false;
@@ -211,33 +205,11 @@ public class TokenBagUIController : MonoBehaviour
 
     private void BuildReturnSelectionList()
     {
-        foreach (var button in returnableButtons)
+        foreach (Killer killer in gameState.removedKillersList)
         {
-            Destroy(button.gameObject);
-        }
-
-        returnableButtons.Clear();
-
-        var parent = removedSelectionPanel.transform.Find("SelectionInfo");
-        var verticalOffset = 0f;
-
-        foreach (var killer in gameState.removedKillersList)
-        {
-            var option = CreateTextButton(
-                parent as RectTransform,
-                $"ReturnOption_{killer}",
-                new Vector2(260f, 42f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0f, -30f - verticalOffset),
-                KillerBagState.GetDisplayName(killer),
-                22,
-                new Color(0.23f, 0.23f, 0.23f, 1f));
-
-            var killerValue = killer;
-            option.onClick.AddListener(() => OnReturnKillerClicked(killerValue));
-            returnableButtons.Add(option);
-            verticalOffset += 50f;
+            Button restoreKillerButton = CreateKillerNameButton(KillerBagState.GetDisplayName(killer));
+            restoreKillerButton.onClick.AddListener(() => OnReturnKillerClicked(killer));
+            restoreKillerButtonsList.Add(restoreKillerButton);
         }
     }
 
@@ -250,6 +222,13 @@ public class TokenBagUIController : MonoBehaviour
 
         gameState.removedKillersList.Remove(killer);
         gameState.bagKillersList.Add(killer);
+        foreach (Button button in restoreKillerButtonsList)
+        {
+            Destroy(button.gameObject);
+        }
+        restoreKillerButtonsList.Clear();
+
+        // TODO: delete all buttons inside KillerOptionsPanel here to prevent them from piling up
         RefreshGameUi();
         CloseRemovedSelection();
         menuOpen = false;
@@ -259,8 +238,8 @@ public class TokenBagUIController : MonoBehaviour
 
     private void CloseRemovedSelection()
     {
-        if (removedSelectionPanel != null)
-            removedSelectionPanel.SetActive(false);
+        if (restoreKillerPanel != null)
+            restoreKillerPanel.SetActive(false);
 
         returnSelectionOpen = false;
 
@@ -339,56 +318,16 @@ public class TokenBagUIController : MonoBehaviour
         }
     }
 
-    private static Button CreateTextButton(RectTransform parent, string name, Vector2 size, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, string text, int fontSize, Color buttonColor)
+    private Button CreateKillerNameButton(string killerName)
     {
-        var buttonObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
-        var rect = buttonObject.GetComponent<RectTransform>();
-        rect.SetParent(parent, false);
-        rect.sizeDelta = size;
-        rect.anchorMin = anchorMin;
-        rect.anchorMax = anchorMax;
-        rect.anchoredPosition = anchoredPosition;
+        var buttonObject = Instantiate(killerNameButtonPrefab);
+        buttonObject.transform.SetParent(killerOptionsPanel.transform, false);
 
-        var image = buttonObject.GetComponent<Image>();
-        image.color = buttonColor;
+        var killerNameButton = buttonObject.GetComponent<Button>();
+        var textObject = buttonObject.GetComponentInChildren<TextMeshProUGUI>();
 
-        var textObject = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-        var textRect = textObject.GetComponent<RectTransform>();
-        textRect.SetParent(rect, false);
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = Vector2.zero;
-        textRect.offsetMax = Vector2.zero;
+        textObject.text = killerName;
 
-        var textComponent = textObject.GetComponent<TextMeshProUGUI>();
-        textComponent.text = text;
-        textComponent.fontSize = fontSize;
-        textComponent.alignment = TextAlignmentOptions.Center;
-        textComponent.color = Color.white;
-        textComponent.raycastTarget = false;
-        textComponent.enableWordWrapping = false;
-
-        return buttonObject.GetComponent<Button>();
-    }
-
-    private static TextMeshProUGUI CreateTextObject(RectTransform parent, string name, Vector2 size, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, string text, int fontSize, TextAlignmentOptions alignment, Color color)
-    {
-        var textObject = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
-        var rect = textObject.GetComponent<RectTransform>();
-        rect.SetParent(parent, false);
-        rect.sizeDelta = size;
-        rect.anchorMin = anchorMin;
-        rect.anchorMax = anchorMax;
-        rect.anchoredPosition = anchoredPosition;
-
-        var textComponent = textObject.GetComponent<TextMeshProUGUI>();
-        textComponent.text = text;
-        textComponent.fontSize = fontSize;
-        textComponent.alignment = alignment;
-        textComponent.color = color;
-        textComponent.raycastTarget = false;
-        textComponent.enableWordWrapping = true;
-
-        return textComponent;
+        return killerNameButton;
     }
 }
