@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 286736899f0037641bb3097ea4cb69e2
+guid: e2e5c852165720f478c0a666a959e730
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8391249335047326535
-    second: White Square Background_0
+      213: -4971339755560879356
+    second: Icon 700_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: White Square Background_0
+      name: Icon 700_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 432
-        height: 432
+        x: 159
+        y: 182
+        width: 383
+        height: 346
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9b475c2403b4c8b80800000000000000
-      internalID: -8391249335047326535
+      spriteID: 40b3404e4d0420bb0800000000000000
+      internalID: -4971339755560879356
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      White Square Background_0: -8391249335047326535
+      Icon 700_0: -4971339755560879356
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
