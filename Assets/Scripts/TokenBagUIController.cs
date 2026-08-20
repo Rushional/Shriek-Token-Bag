@@ -52,31 +52,37 @@ public class TokenBagUIController : MonoBehaviour
     // TODO: move code in this method into 2 new methods: AddButtonListeners() and SetupPanels()
     private void Setup()
     {
-        // TODO: remove if nulls? 
-        if (menuButton != null) menuButton.onClick.AddListener(OpenMenu);
-        if (drawTokenButton != null) drawTokenButton.onClick.AddListener(DrawKillerToken);
-        if (putBackButton != null) putBackButton.onClick.AddListener(PutKillerBack);
-        if (removeButton != null) removeButton.onClick.AddListener(RemoveKiller);
-        if (resetBagButton != null) resetBagButton.onClick.AddListener(OpenResetConfirmation);
-        if (restoreKillerButton != null) restoreKillerButton.onClick.AddListener(RestoreKiller);
-        if (menuCloseButton != null) menuCloseButton.onClick.AddListener(CloseResetConfirmation);
-        if (confirmationYesButton != null) confirmationYesButton.onClick.AddListener(ResetBag);
-        if (confirmationNoButton != null) confirmationNoButton.onClick.AddListener(CancelReset);
-        if (closeKillerOptionsButton != null) closeKillerOptionsButton.onClick.AddListener(CloseRestoreSelection);
-        noRemovedKillersButton.onClick.AddListener(CloseNoKillersInfo);
+        AddButtonListeners();
+        SetupPanelsGameStart();
+    }
 
-        if (menuPanel != null) menuPanel.SetActive(false);
-        if (confirmationPanel != null) confirmationPanel.SetActive(false);
-        if (restoreKillerPanel != null) restoreKillerPanel.SetActive(false);
-        if (gameplayRoot != null) gameplayRoot.SetActive(true);
+    private void AddButtonListeners()
+    {
+        menuButton.onClick.AddListener(OpenMenu);
+        menuCloseButton.onClick.AddListener(CloseMenuPressed);
+        drawTokenButton.onClick.AddListener(DrawKillerToken);
+        putBackButton.onClick.AddListener(PutKillerBack);
+        removeButton.onClick.AddListener(RemoveKiller);
+        resetBagButton.onClick.AddListener(OpenResetConfirmation);
+        confirmationYesButton.onClick.AddListener(ResetBag);
+        confirmationNoButton.onClick.AddListener(CancelReset);
+        restoreKillerButton.onClick.AddListener(OpenRestoreKillerPanel);
+        closeKillerOptionsButton.onClick.AddListener(CloseRestoreSelection);
+        noRemovedKillersButton.onClick.AddListener(CloseNoKillersInfo);
+    }
+
+    private void SetupPanelsGameStart()
+    {
+        CloseMenu();
+        CloseResetConfirmationPanel();
+        restoreKillerPanel.SetActive(false);
+        returnSelectionOpen = false;
+        gameplayRoot.SetActive(true);
     }
 
     private void SetGameplayControlsActive(bool isActive)
     {
-        if (gameplayRoot != null)
-        {
-            gameplayRoot.SetActive(isActive);
-        }
+        gameplayRoot.SetActive(isActive);
     }
 
     private void OpenMenu()
@@ -91,67 +97,57 @@ public class TokenBagUIController : MonoBehaviour
         SetGameplayControlsActive(false);
     }
 
-    private void CloseResetConfirmation()
+    private void CloseMenuPressed()
     {
-        // TODO: this looks wrong. We're closing the confirmation window, shouldn't affect menu. 
+        CloseMenu();
+        SetGameplayControlsActive(true);
+    }
+
+    private void CloseMenu()
+    {
         menuPanel.SetActive(false);
         menuOpen = false;
-        confirmationPanel.SetActive(false);
-        resetConfirmationOpen = false;
-        SetGameplayControlsActive(true);
-        RefreshGameUi();
     }
 
     private void OpenResetConfirmation()
     {
-        if (!menuOpen)
-        {
-            return;
-        }
-
-        menuPanel.SetActive(false);
+        CloseMenu();
         confirmationPanel.SetActive(true);
         resetConfirmationOpen = true;
-        // SetGameplayControlsActive(false);
     }
 
     private void CancelReset()
     {
-        confirmationPanel.SetActive(false);
-        resetConfirmationOpen = false;
+        CloseResetConfirmationPanel();
         menuPanel.SetActive(true);
         menuOpen = true;
-        // SetGameplayControlsActive(false);
     }
 
     private void ResetBag()
     {
+        CloseResetConfirmationPanel();
         gameState.Reset();
-        CloseResetConfirmation();
         RefreshGameUi();
     }
 
-    private void RestoreKiller()
+    private void CloseResetConfirmationPanel()
     {
-        menuPanel.SetActive(false);
-        menuOpen = false;
+        confirmationPanel.SetActive(false);
+        resetConfirmationOpen = false;
+    }
+
+    private void OpenRestoreKillerPanel()
+    {
+        CloseMenu();
         if (gameState.removedKillersList.Count == 0)
         {
-            ShowNothingToReturnDialog();
+            noRemovedKillersPanel.SetActive(true);
             return;
         }
         
         BuildReturnSelectionList();
         restoreKillerPanel.SetActive(true);
         returnSelectionOpen = true;
-        SetGameplayControlsActive(false);
-    }
-
-    private void ShowNothingToReturnDialog()
-    {
-        menuPanel.SetActive(false);
-        noRemovedKillersPanel.SetActive(true);
-        SetGameplayControlsActive(false);
     }
 
     private void CloseNoKillersInfo()
@@ -165,12 +161,12 @@ public class TokenBagUIController : MonoBehaviour
         foreach (Killer killer in gameState.removedKillersList)
         {
             Button restoreKillerButton = CreateKillerNameButton(KillerBagState.GetDisplayName(killer));
-            restoreKillerButton.onClick.AddListener(() => OnReturnKillerClicked(killer));
+            restoreKillerButton.onClick.AddListener(() => RestoreKiller(killer));
             restoreKillerButtonsList.Add(restoreKillerButton);
         }
     }
 
-    private void OnReturnKillerClicked(Killer killer)
+    private void RestoreKiller(Killer killer)
     {
         if (!gameState.removedKillersList.Contains(killer))
         {
@@ -189,8 +185,7 @@ public class TokenBagUIController : MonoBehaviour
 
     private void CloseRestoreSelection()
     {
-        if (restoreKillerPanel != null)
-            restoreKillerPanel.SetActive(false);
+        restoreKillerPanel.SetActive(false);
         returnSelectionOpen = false;
         ClearRestoreKillerButtons();
         SetGameplayControlsActive(true);
