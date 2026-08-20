@@ -1635,7 +1635,7 @@ MonoBehaviour:
   currentKillerText: {fileID: 4072429241291769960}
   removedKillersText: {fileID: 6249009827952924123}
   resetBagButton: {fileID: 4551868610125105025}
-  returnFromRemovedButton: {fileID: 4582189372529404211}
+  restoreKillerButton: {fileID: 4582189372529404211}
   menuCloseButton: {fileID: 1677146462056895660}
   confirmationYesButton: {fileID: 2209284236217520558}
   confirmationNoButton: {fileID: 3428694351220907500}
@@ -1644,7 +1644,6 @@ MonoBehaviour:
   killerNameButtonPrefab: {fileID: 7429455321115142279, guid: c752785bfcdc21946b60fb91b15333d5, type: 3}
   noRemovedKillersPanel: {fileID: 5584868655008415311}
   noRemovedKillersButton: {fileID: 1336800018759853949}
-  noRemovedKillersText: {fileID: 7952422777347263460}
 --- !u!1 &4444026259051295361
 GameObject:
   m_ObjectHideFlags: 0
@@ -2151,7 +2150,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Return from removed
+  m_text: Put a killer back
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3105,7 +3104,7 @@ GameObject:
   - component: {fileID: 6709658353664372593}
   - component: {fileID: 4582189372529404211}
   m_Layer: 0
-  m_Name: ReturnFromRemovedButton
+  m_Name: RestoreKillerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

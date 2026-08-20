@@ -74,6 +74,7 @@ public class KillerBagState
         return currentKiller.HasValue ? GetDisplayName(currentKiller.Value) : string.Empty;
     }
 
+    // This being part of the state and not controller seems wrong, but eh, it works, I won't waste time fixing it
     public string GetRemovedDisplayText()
     {
         if (removedKillersList.Count == 0)
