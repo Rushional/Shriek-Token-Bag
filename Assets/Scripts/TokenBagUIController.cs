@@ -36,20 +36,12 @@ public class TokenBagUIController : MonoBehaviour
     [SerializeField] private GameObject noRemovedKillersPanel;
     [SerializeField] private Button noRemovedKillersButton;
 
-    private bool menuOpen;
-    private bool resetConfirmationOpen;
-    private bool returnSelectionOpen;
-
-    // At runtime, bind to UI GameObjects created in the Editor.
-    // The Editor bootstrap will create the UI once; TokenBagUIController uses those objects at runtime.
     private void Awake()
     {
         Setup();
         gameState.Reset();
-        RefreshGameUi();
     }
 
-    // TODO: move code in this method into 2 new methods: AddButtonListeners() and SetupPanels()
     private void Setup()
     {
         AddButtonListeners();
@@ -76,8 +68,27 @@ public class TokenBagUIController : MonoBehaviour
         CloseMenu();
         CloseResetConfirmationPanel();
         restoreKillerPanel.SetActive(false);
-        returnSelectionOpen = false;
+
         gameplayRoot.SetActive(true);
+
+        ResetTokenButtons();
+
+        CleanupCurrentKiller();
+        removedKillersText.text = string.Empty;
+        removedKillersText.gameObject.SetActive(false);
+    }
+
+    private void ResetTokenButtons()
+    {
+        drawTokenButton.gameObject.SetActive(true);
+        putBackButton.gameObject.SetActive(false);
+        removeButton.gameObject.SetActive(false);
+    }
+
+    private void CleanupCurrentKiller()
+    {
+        currentKillerText.text = string.Empty;
+        currentKillerText.gameObject.SetActive(false);
     }
 
     private void SetGameplayControlsActive(bool isActive)
@@ -87,13 +98,7 @@ public class TokenBagUIController : MonoBehaviour
 
     private void OpenMenu()
     {
-        if (menuOpen || resetConfirmationOpen || returnSelectionOpen)
-        {
-            return;
-        }
-
         menuPanel.SetActive(true);
-        menuOpen = true;
         SetGameplayControlsActive(false);
     }
 
@@ -106,34 +111,30 @@ public class TokenBagUIController : MonoBehaviour
     private void CloseMenu()
     {
         menuPanel.SetActive(false);
-        menuOpen = false;
     }
 
     private void OpenResetConfirmation()
     {
         CloseMenu();
         confirmationPanel.SetActive(true);
-        resetConfirmationOpen = true;
     }
 
     private void CancelReset()
     {
         CloseResetConfirmationPanel();
         menuPanel.SetActive(true);
-        menuOpen = true;
     }
 
     private void ResetBag()
     {
         CloseResetConfirmationPanel();
         gameState.Reset();
-        RefreshGameUi();
+        SetupPanelsGameStart();
     }
 
     private void CloseResetConfirmationPanel()
     {
         confirmationPanel.SetActive(false);
-        resetConfirmationOpen = false;
     }
 
     private void OpenRestoreKillerPanel()
@@ -147,7 +148,6 @@ public class TokenBagUIController : MonoBehaviour
         
         BuildReturnSelectionList();
         restoreKillerPanel.SetActive(true);
-        returnSelectionOpen = true;
     }
 
     private void CloseNoKillersInfo()
@@ -168,25 +168,24 @@ public class TokenBagUIController : MonoBehaviour
 
     private void RestoreKiller(Killer killer)
     {
-        if (!gameState.removedKillersList.Contains(killer))
-        {
-            Debug.LogError("Attempt to remove a killer that wasn't in the removedKillersList. Shouldn't be possible.");
-            return;
-        }
-        gameState.removedKillersList.Remove(killer);
-        gameState.bagKillersList.Add(killer);
+        gameState.RestoreRemovedKiller(killer);
         ClearRestoreKillerButtons();
-        RefreshGameUi();
+        RefreshRemovedKillers();
         CloseRestoreSelection();
-        menuOpen = false;
         menuPanel.SetActive(false);
         SetGameplayControlsActive(true);
+    }
+
+    private void RefreshRemovedKillers()
+    {
+        bool hasRemoved = gameState.removedKillersList.Count > 0;
+        removedKillersText.gameObject.SetActive(hasRemoved);
+        removedKillersText.text = gameState.GetRemovedDisplayText();
     }
 
     private void CloseRestoreSelection()
     {
         restoreKillerPanel.SetActive(false);
-        returnSelectionOpen = false;
         ClearRestoreKillerButtons();
         SetGameplayControlsActive(true);
     }
@@ -208,61 +207,27 @@ public class TokenBagUIController : MonoBehaviour
         }
 
         gameState.DrawRandomKiller();
-        RefreshGameUi();
+        currentKillerText.text = gameState.GetCurrentDisplayName();
+        currentKillerText.gameObject.SetActive(true);
+
+        drawTokenButton.gameObject.SetActive(false);
+        putBackButton.gameObject.SetActive(true);
+        removeButton.gameObject.SetActive(true);
     }
 
     private void PutKillerBack()
     {
-        if (!gameState.currentKiller.HasValue)
-        {
-            return;
-        }
-
         gameState.PutBackCurrentKiller();
-        RefreshGameUi();
+        CleanupCurrentKiller();
+        ResetTokenButtons();
     }
 
     private void RemoveKiller()
     {
-        if (!gameState.currentKiller.HasValue)
-        {
-            return;
-        }
-
         gameState.RemoveCurrentKiller();
-        RefreshGameUi();
-    }
-
-    private void RefreshGameUi()
-    {
-        bool hasCurrent = gameState.currentKiller.HasValue;
-
-        drawTokenButton.gameObject.SetActive(!hasCurrent && gameState.bagKillersList.Count > 0);
-        putBackButton.gameObject.SetActive(hasCurrent);
-        removeButton.gameObject.SetActive(hasCurrent);
-        currentKillerText.gameObject.SetActive(hasCurrent);
-
-        if (hasCurrent)
-        {
-            currentKillerText.text = gameState.GetCurrentDisplayName();
-        }
-        else
-        {
-            currentKillerText.text = string.Empty;
-        }
-
-        bool hasRemoved = gameState.removedKillersList.Count > 0;
-        removedKillersText.gameObject.SetActive(hasRemoved);
-        removedKillersText.text = gameState.GetRemovedDisplayText();
-
-        if (!menuOpen && !resetConfirmationOpen && !returnSelectionOpen)
-        {
-            SetGameplayControlsActive(true);
-        }
-        else
-        {
-            SetGameplayControlsActive(false);
-        }
+        CleanupCurrentKiller();
+        RefreshRemovedKillers();
+        ResetTokenButtons();
     }
 
     private Button CreateKillerNameButton(string killerName)

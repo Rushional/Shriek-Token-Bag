@@ -49,24 +49,20 @@ public class KillerBagState
 
     public void PutBackCurrentKiller()
     {
-        if (!currentKiller.HasValue)
-        {
-            return;
-        }
-
         currentKiller = null;
     }
 
     public void RemoveCurrentKiller()
     {
-        if (!currentKiller.HasValue)
-        {
-            return;
-        }
-
         removedKillersList.Add(currentKiller.Value);
         bagKillersList.Remove(currentKiller.Value);
         currentKiller = null;
+    }
+
+    public void RestoreRemovedKiller(Killer killer)
+    {
+        removedKillersList.Remove(killer);
+        bagKillersList.Add(killer);
     }
 
     public string GetCurrentDisplayName()
