@@ -21,6 +21,7 @@ public class TokenBagUIController : MonoBehaviour
     [SerializeField] private Button removeButton;
 
     [SerializeField] private TextMeshProUGUI currentKillerText;
+    [SerializeField] private Image killerImage;
     [SerializeField] private TextMeshProUGUI removedKillersText;
 
     [SerializeField] private Button resetBagButton;
@@ -88,6 +89,7 @@ public class TokenBagUIController : MonoBehaviour
     {
         currentKillerText.text = string.Empty;
         currentKillerText.gameObject.SetActive(false);
+        killerImage.gameObject.SetActive(false);
     }
 
     private void SetGameplayControlsActive(bool isActive)
@@ -215,12 +217,18 @@ public class TokenBagUIController : MonoBehaviour
         }
 
         gameState.DrawRandomKiller();
-        currentKillerText.text = gameState.GetCurrentDisplayName();
-        currentKillerText.gameObject.SetActive(true);
+        ShowCurrentKiller();
 
         drawTokenButton.gameObject.SetActive(false);
         putBackButton.gameObject.SetActive(true);
         removeButton.gameObject.SetActive(true);
+    }
+
+    private void ShowCurrentKiller()
+    {
+        currentKillerText.text = gameState.GetCurrentDisplayName();
+        currentKillerText.gameObject.SetActive(true);
+        killerImage.gameObject.SetActive(true);
     }
 
     private void PutKillerBack()
