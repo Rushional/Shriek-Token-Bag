@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-// TODO: this does nothing, right? Remove?
 using UnityEngine.UI;
 
 public class TokenBagUIController : MonoBehaviour
@@ -140,7 +139,7 @@ public class TokenBagUIController : MonoBehaviour
     private void OpenRestoreKillerPanel()
     {
         CloseMenu();
-        if (gameState.removedKillersList.Count == 0)
+        if (!gameState.HasRemovedKillers)
         {
             noRemovedKillersPanel.SetActive(true);
             return;
@@ -158,7 +157,7 @@ public class TokenBagUIController : MonoBehaviour
 
     private void BuildReturnSelectionList()
     {
-        foreach (Killer killer in gameState.removedKillersList)
+        foreach (Killer killer in gameState.GetRemovedKillersList())
         {
             Button restoreKillerButton = CreateKillerNameButton(KillerBagState.GetDisplayName(killer));
             restoreKillerButton.onClick.AddListener(() => RestoreKiller(killer));
@@ -178,9 +177,18 @@ public class TokenBagUIController : MonoBehaviour
 
     private void RefreshRemovedKillers()
     {
-        bool hasRemoved = gameState.removedKillersList.Count > 0;
-        removedKillersText.gameObject.SetActive(hasRemoved);
-        removedKillersText.text = gameState.GetRemovedDisplayText();
+        removedKillersText.gameObject.SetActive(gameState.HasRemovedKillers);
+        removedKillersText.text = CreateRemovedKillersString(gameState.GetRemovedKillersList());
+    }
+
+    public string CreateRemovedKillersString(List<Killer> removedKillersList)
+    {
+        if (removedKillersList.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        return string.Join(Environment.NewLine, removedKillersList.Select(KillerBagState.GetDisplayName));
     }
 
     private void CloseRestoreSelection()

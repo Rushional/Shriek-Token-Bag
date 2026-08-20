@@ -18,9 +18,9 @@ public enum Killer
 
 public class KillerBagState
 {
-    public List<Killer> bagKillersList = new List<Killer>();
-    public List<Killer> removedKillersList = new List<Killer>();
-    public Killer? currentKiller;
+    private List<Killer> bagKillersList = new List<Killer>();
+    private List<Killer> removedKillersList = new List<Killer>();
+    private Killer? currentKiller;
 
     public void Reset()
     {
@@ -70,17 +70,6 @@ public class KillerBagState
         return currentKiller.HasValue ? GetDisplayName(currentKiller.Value) : string.Empty;
     }
 
-    // This being part of the state and not controller seems wrong, but eh, it works, I won't waste time fixing it
-    public string GetRemovedDisplayText()
-    {
-        if (removedKillersList.Count == 0)
-        {
-            return string.Empty;
-        }
-
-        return string.Join(Environment.NewLine, removedKillersList.Select(GetDisplayName));
-    }
-
     public static string GetDisplayName(Killer killer)
     {
         switch (killer)
@@ -108,5 +97,20 @@ public class KillerBagState
             default:
                 return killer.ToString();
         }
+    }
+
+    public List<Killer> GetRemovedKillersList()
+    {
+        return removedKillersList;
+    }
+
+    public List<Killer> GetBagKillersList()
+    {
+        return bagKillersList;
+    }
+
+    public Killer? GetCurrentKiller() 
+    {
+        return currentKiller;
     }
 }
