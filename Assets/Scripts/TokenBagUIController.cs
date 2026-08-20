@@ -53,15 +53,15 @@ public class TokenBagUIController : MonoBehaviour
     private void Setup()
     {
         // TODO: remove if nulls? 
-        if (menuButton != null) menuButton.onClick.AddListener(OnMenuButtonClicked);
-        if (drawTokenButton != null) drawTokenButton.onClick.AddListener(OnDrawTokenClicked);
-        if (putBackButton != null) putBackButton.onClick.AddListener(OnPutBackClicked);
-        if (removeButton != null) removeButton.onClick.AddListener(OnRemoveClicked);
-        if (resetBagButton != null) resetBagButton.onClick.AddListener(OnResetBagClicked);
+        if (menuButton != null) menuButton.onClick.AddListener(OpenMenu);
+        if (drawTokenButton != null) drawTokenButton.onClick.AddListener(DrawKillerToken);
+        if (putBackButton != null) putBackButton.onClick.AddListener(PutKillerBack);
+        if (removeButton != null) removeButton.onClick.AddListener(RemoveKiller);
+        if (resetBagButton != null) resetBagButton.onClick.AddListener(OpenResetConfirmation);
         if (restoreKillerButton != null) restoreKillerButton.onClick.AddListener(RestoreKiller);
         if (menuCloseButton != null) menuCloseButton.onClick.AddListener(CloseResetConfirmation);
-        if (confirmationYesButton != null) confirmationYesButton.onClick.AddListener(OnResetConfirmed);
-        if (confirmationNoButton != null) confirmationNoButton.onClick.AddListener(OnConfirmationCancelled);
+        if (confirmationYesButton != null) confirmationYesButton.onClick.AddListener(ResetBag);
+        if (confirmationNoButton != null) confirmationNoButton.onClick.AddListener(CancelReset);
         if (closeKillerOptionsButton != null) closeKillerOptionsButton.onClick.AddListener(CloseRestoreSelection);
         noRemovedKillersButton.onClick.AddListener(CloseNoKillersInfo);
 
@@ -79,7 +79,7 @@ public class TokenBagUIController : MonoBehaviour
         }
     }
 
-    private void OnMenuButtonClicked()
+    private void OpenMenu()
     {
         if (menuOpen || resetConfirmationOpen || returnSelectionOpen)
         {
@@ -102,7 +102,7 @@ public class TokenBagUIController : MonoBehaviour
         RefreshGameUi();
     }
 
-    private void OnResetBagClicked()
+    private void OpenResetConfirmation()
     {
         if (!menuOpen)
         {
@@ -115,7 +115,7 @@ public class TokenBagUIController : MonoBehaviour
         // SetGameplayControlsActive(false);
     }
 
-    private void OnConfirmationCancelled()
+    private void CancelReset()
     {
         confirmationPanel.SetActive(false);
         resetConfirmationOpen = false;
@@ -124,7 +124,7 @@ public class TokenBagUIController : MonoBehaviour
         // SetGameplayControlsActive(false);
     }
 
-    private void OnResetConfirmed()
+    private void ResetBag()
     {
         gameState.Reset();
         CloseResetConfirmation();
@@ -205,7 +205,7 @@ public class TokenBagUIController : MonoBehaviour
         restoreKillerButtonsList.Clear();
     }
 
-    private void OnDrawTokenClicked()
+    private void DrawKillerToken()
     {
         if (!gameState.CanDrawToken)
         {
@@ -216,7 +216,7 @@ public class TokenBagUIController : MonoBehaviour
         RefreshGameUi();
     }
 
-    private void OnPutBackClicked()
+    private void PutKillerBack()
     {
         if (!gameState.currentKiller.HasValue)
         {
@@ -227,7 +227,7 @@ public class TokenBagUIController : MonoBehaviour
         RefreshGameUi();
     }
 
-    private void OnRemoveClicked()
+    private void RemoveKiller()
     {
         if (!gameState.currentKiller.HasValue)
         {
