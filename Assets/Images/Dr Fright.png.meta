@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6d022de87c9f6814d8aecf4e0a21504d
+guid: 5235b6d1976703644913a5da1cb5a05a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7083514176570814414
-    second: Hans token_0
+      213: -7721959587979195049
+    second: Dr Fright_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hans token_0
+      name: Dr Fright_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ecf62ff0d92bd4260800000000000000
-      internalID: 7083514176570814414
+      spriteID: 75d049cdaa616d490800000000000000
+      internalID: -7721959587979195049
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Hans token_0: 7083514176570814414
+      Dr Fright_0: -7721959587979195049
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

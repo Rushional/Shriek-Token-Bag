@@ -1645,6 +1645,16 @@ MonoBehaviour:
   killerNameButtonPrefab: {fileID: 7429455321115142279, guid: c752785bfcdc21946b60fb91b15333d5, type: 3}
   noRemovedKillersPanel: {fileID: 5584868655008415311}
   noRemovedKillersButton: {fileID: 1336800018759853949}
+  bigBadWolfSprite: {fileID: 1691455800605892073, guid: a8d97a11fc99f134c84c94f24a95a0dd, type: 3}
+  hansSprite: {fileID: 1371390633896898246, guid: 6d022de87c9f6814d8aecf4e0a21504d, type: 3}
+  drFrightSprite: {fileID: -7721959587979195049, guid: 5235b6d1976703644913a5da1cb5a05a, type: 3}
+  geppettoSprite: {fileID: 3421686450911521083, guid: 0bca221dc43e1814bafcb0dbbe27a929, type: 3}
+  ratchetLadySprite: {fileID: -2411095806477255201, guid: dc1ac7bd8219429459b7dcf910dc855f, type: 3}
+  bagheadSprite: {fileID: 3376117851793196570, guid: 9a74c6ef3262bca45a52491cc21faab8, type: 3}
+  hunterSprite: {fileID: -3085747607584028519, guid: 7f3c9c34caf77064494f3ecdef614b99, type: 3}
+  razorfaceSprite: {fileID: 2875975971948743469, guid: be3211c012e30d846a64a052d4d40926, type: 3}
+  tormentorSprite: {fileID: 8189507592343353483, guid: 104f0ab4cbe8f8d49aa35c92ca54e45b, type: 3}
+  krampusSprite: {fileID: -604934674181481706, guid: 8ab032c309702c644a6a3a8c3a20e20a, type: 3}
 --- !u!1 &4444026259051295361
 GameObject:
   m_ObjectHideFlags: 0

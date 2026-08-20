@@ -36,6 +36,19 @@ public class TokenBagUIController : MonoBehaviour
     [SerializeField] private GameObject noRemovedKillersPanel;
     [SerializeField] private Button noRemovedKillersButton;
 
+
+    [SerializeField] private Sprite bigBadWolfSprite;
+    [SerializeField] private Sprite hansSprite;
+    [SerializeField] private Sprite drFrightSprite;
+    [SerializeField] private Sprite geppettoSprite;
+    [SerializeField] private Sprite ratchetLadySprite;
+    [SerializeField] private Sprite bagheadSprite;
+    [SerializeField] private Sprite hunterSprite;
+    [SerializeField] private Sprite razorfaceSprite;
+    [SerializeField] private Sprite tormentorSprite;
+    [SerializeField] private Sprite krampusSprite;
+    private Dictionary<Killer, Sprite> killerSprites;
+
     private void Awake()
     {
         Setup();
@@ -44,8 +57,26 @@ public class TokenBagUIController : MonoBehaviour
 
     private void Setup()
     {
+        FillKillerSpritesDictionary();
         AddButtonListeners();
         SetupPanelsGameStart();
+    }
+
+    private void FillKillerSpritesDictionary()
+    {
+        killerSprites = new Dictionary<Killer, Sprite>
+        {
+            { Killer.BigBadWolf, bigBadWolfSprite },
+            { Killer.Hans, hansSprite },
+            { Killer.DrFright, drFrightSprite },
+            { Killer.Geppetto, geppettoSprite },
+            { Killer.RatchetLady, ratchetLadySprite },
+            { Killer.Baghead, bagheadSprite },
+            { Killer.HUNTER, hunterSprite },
+            { Killer.Razorface, razorfaceSprite },
+            { Killer.Tormentor, tormentorSprite },
+            { Killer.Krampus, krampusSprite }
+        };
     }
 
     private void AddButtonListeners()
@@ -228,6 +259,7 @@ public class TokenBagUIController : MonoBehaviour
     {
         currentKillerText.text = gameState.GetCurrentDisplayName();
         currentKillerText.gameObject.SetActive(true);
+        killerImage.sprite = killerSprites[gameState.GetCurrentKiller().Value];
         killerImage.gameObject.SetActive(true);
     }
 
